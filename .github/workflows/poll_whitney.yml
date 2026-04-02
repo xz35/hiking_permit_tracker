@@ -1,0 +1,73 @@
+name: poll_whitney
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  poll-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Run tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+
+      - name: Derive Pages URLs
+        shell: pwsh
+        run: |
+          $repoName = ($env:GITHUB_REPOSITORY -split '/')[1]
+          $baseUrl = "https://$env:GITHUB_REPOSITORY_OWNER.github.io/$repoName"
+          "WHITNEY_PREVIOUS_SNAPSHOT_URL=$baseUrl/latest.json" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WHITNEY_PREVIOUS_HISTORY_URL=$baseUrl/history.json" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WHITNEY_DATA_PUBLIC_URL=$baseUrl/latest.json" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Generate watcher data
+        env:
+          WHITNEY_OUTPUT_DIR: build/pages
+          WHITNEY_MONTHS: ${{ vars.WHITNEY_MONTHS }}
+          WHITNEY_TARGET_WEEKDAYS: ${{ vars.WHITNEY_TARGET_WEEKDAYS }}
+          WHITNEY_ALERT_THRESHOLD: ${{ vars.WHITNEY_ALERT_THRESHOLD }}
+          WHITNEY_ALERT_DAY_USE: ${{ vars.WHITNEY_ALERT_DAY_USE }}
+          WHITNEY_ALERT_SUB_THRESHOLD_OVERNIGHT: ${{ vars.WHITNEY_ALERT_SUB_THRESHOLD_OVERNIGHT }}
+          WHITNEY_EMAIL_ENABLED: ${{ secrets.WHITNEY_GMAIL_USERNAME != '' && secrets.WHITNEY_GMAIL_APP_PASSWORD != '' && secrets.WHITNEY_EMAIL_TO != '' }}
+          WHITNEY_GMAIL_USERNAME: ${{ secrets.WHITNEY_GMAIL_USERNAME }}
+          WHITNEY_GMAIL_APP_PASSWORD: ${{ secrets.WHITNEY_GMAIL_APP_PASSWORD }}
+          WHITNEY_EMAIL_TO: ${{ secrets.WHITNEY_EMAIL_TO }}
+        run: |
+          python -m whitney_watcher.cli --output-dir build/pages
+          touch build/pages/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/pages
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

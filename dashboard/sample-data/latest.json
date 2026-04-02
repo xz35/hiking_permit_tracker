@@ -1,0 +1,99 @@
+{
+  "generated_at": "2026-04-02T12:00:00Z",
+  "permit_id": 445860,
+  "public_permit_url": "https://www.recreation.gov/permits/445860",
+  "source": {
+    "availability_url": "https://www.recreation.gov/api/permitinyo/445860/availability?start_date=2026-07-01&end_date=2026-08-31&commercial_acct=false",
+    "months": [
+      "2026-07",
+      "2026-08"
+    ],
+    "preferred_permit_type": "overnight",
+    "visible_secondary_permit_type": "day_use",
+    "alert_threshold": 2
+  },
+  "summary": {
+    "total_records": 6,
+    "primary_match_count": 3
+  },
+  "records": [
+    {
+      "observed_at": "2026-04-02T12:00:00Z",
+      "entry_date": "2026-07-03",
+      "permit_code": "166",
+      "permit_type": "overnight",
+      "total_capacity": 60,
+      "available_capacity": 3,
+      "is_walkup": false,
+      "is_primary_match": true,
+      "is_secondary_visible": true,
+      "match_reason": "overnight permit on preferred weekday with capacity >=2",
+      "source_last_status": "ok"
+    },
+    {
+      "observed_at": "2026-04-02T12:00:00Z",
+      "entry_date": "2026-07-03",
+      "permit_code": "406",
+      "permit_type": "day_use",
+      "total_capacity": 100,
+      "available_capacity": 9,
+      "is_walkup": false,
+      "is_primary_match": false,
+      "is_secondary_visible": true,
+      "match_reason": "Visible secondary permit availability",
+      "source_last_status": "ok"
+    },
+    {
+      "observed_at": "2026-04-02T12:00:00Z",
+      "entry_date": "2026-07-09",
+      "permit_code": "166",
+      "permit_type": "overnight",
+      "total_capacity": 60,
+      "available_capacity": 2,
+      "is_walkup": false,
+      "is_primary_match": true,
+      "is_secondary_visible": true,
+      "match_reason": "overnight permit on preferred weekday with capacity >=2",
+      "source_last_status": "ok"
+    },
+    {
+      "observed_at": "2026-04-02T12:00:00Z",
+      "entry_date": "2026-07-09",
+      "permit_code": "406",
+      "permit_type": "day_use",
+      "total_capacity": 100,
+      "available_capacity": 4,
+      "is_walkup": false,
+      "is_primary_match": false,
+      "is_secondary_visible": true,
+      "match_reason": "Visible secondary permit availability",
+      "source_last_status": "ok"
+    },
+    {
+      "observed_at": "2026-04-02T12:00:00Z",
+      "entry_date": "2026-08-06",
+      "permit_code": "166",
+      "permit_type": "overnight",
+      "total_capacity": 60,
+      "available_capacity": 4,
+      "is_walkup": false,
+      "is_primary_match": true,
+      "is_secondary_visible": true,
+      "match_reason": "overnight permit on preferred weekday with capacity >=2",
+      "source_last_status": "ok"
+    },
+    {
+      "observed_at": "2026-04-02T12:00:00Z",
+      "entry_date": "2026-08-06",
+      "permit_code": "406",
+      "permit_type": "day_use",
+      "total_capacity": 100,
+      "available_capacity": 1,
+      "is_walkup": false,
+      "is_primary_match": false,
+      "is_secondary_visible": true,
+      "match_reason": "Visible secondary permit availability",
+      "source_last_status": "ok"
+    }
+  ]
+}

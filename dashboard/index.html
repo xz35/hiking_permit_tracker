@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mt. Whitney Permit Watcher</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">Mt. Whitney Permit Watcher</p>
+        <h1>July and August 2026 permit availability at a glance.</h1>
+        <p class="hero-copy">
+          Overnight Thursdays, Fridays, and Saturdays are highlighted when
+          availability reaches 2 or more. Day-use stays visible for context.
+        </p>
+      </section>
+
+      <section class="status-grid">
+        <article class="status-card">
+          <span class="status-label">Last refresh</span>
+          <strong id="last-refresh">Loading...</strong>
+        </article>
+        <article class="status-card">
+          <span class="status-label">Primary matches</span>
+          <strong id="primary-count">-</strong>
+        </article>
+        <article class="status-card">
+          <span class="status-label">Data source</span>
+          <strong id="source-link">-</strong>
+        </article>
+      </section>
+
+      <section class="controls">
+        <label>
+          <span>Permit filter</span>
+          <select id="permit-filter">
+            <option value="all">All permits</option>
+            <option value="overnight">Overnight only</option>
+            <option value="day_use">Day-use only</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="legend">
+        <div><span class="legend-swatch swatch-match"></span> Target overnight, 2+</div>
+        <div><span class="legend-swatch swatch-overnight"></span> Overnight availability</div>
+        <div><span class="legend-swatch swatch-dayuse"></span> Day-use availability</div>
+        <div><span class="legend-swatch swatch-empty"></span> No observed availability</div>
+      </section>
+
+      <section id="calendar-root" class="calendar-columns"></section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./app.js"></script>
+  </body>
+  </html>
