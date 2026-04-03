@@ -96,7 +96,7 @@
       meta.className = "day-meta";
 
       if (records.length === 0) {
-        meta.appendChild(createPill("No observed availability", "empty"));
+        meta.appendChild(createPill("", "empty"));
       } else {
         records
           .sort(sortRecords)

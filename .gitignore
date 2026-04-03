@@ -11,3 +11,4 @@ Thumbs.db
 .env
 output/
 dashboard/.vercel/
+LOCAL_PROJECT_BRIEF.md

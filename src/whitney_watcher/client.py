@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import date
+from calendar import monthrange
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -21,7 +22,7 @@ class WhitneyAvailabilityClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
 
-    def fetch(self, start_date: date, end_date: date) -> FetchResult:
+    def _fetch_range(self, start_date: date, end_date: date) -> FetchResult:
         query = urlencode(
             {
                 "start_date": start_date.isoformat(),
@@ -51,4 +52,21 @@ class WhitneyAvailabilityClient:
             raise RuntimeError("Whitney API response did not include a payload object")
 
         return FetchResult(payload=payload["payload"], request_url=request_url, status="ok")
+
+    def fetch(self, start_date: date, end_date: date) -> FetchResult:
+        merged_payload: dict = {}
+        request_urls: list[str] = []
+
+        for year, month in self.settings.months:
+            month_start = date(year, month, 1)
+            month_end = date(year, month, monthrange(year, month)[1])
+            result = self._fetch_range(month_start, month_end)
+            merged_payload.update(result.payload)
+            request_urls.append(result.request_url)
+
+        return FetchResult(
+            payload=merged_payload,
+            request_url=",".join(request_urls),
+            status="ok",
+        )
 

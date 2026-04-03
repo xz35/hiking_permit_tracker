@@ -59,6 +59,10 @@ jobs:
           WHITNEY_EMAIL_TO: ${{ secrets.WHITNEY_EMAIL_TO }}
         run: |
           python -m whitney_watcher.cli --output-dir build/pages
+          cp dashboard/index.html build/pages/
+          cp dashboard/app.js build/pages/
+          cp dashboard/styles.css build/pages/
+          cp dashboard/config.js build/pages/
           touch build/pages/.nojekyll
 
       - name: Configure GitHub Pages
