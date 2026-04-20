@@ -7,14 +7,21 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="page-shell">
+    <main class="page-shell" id="page-shell">
       <section class="hero">
-        <p class="eyebrow">Mt. Whitney Permit Watcher</p>
-        <h1>July and August 2026 permit availability at a glance.</h1>
-        <p class="hero-copy">
-          Overnight Thursdays, Fridays, and Saturdays are highlighted when
-          availability reaches 2 or more. Day-use stays visible for context.
-        </p>
+        <div class="hero-header">
+          <div>
+            <p class="eyebrow">Mt. Whitney Permit Watcher</p>
+            <h1>July and August 2026 permit availability at a glance.</h1>
+            <p class="hero-copy">
+              Overnight Thursdays, Fridays, and Saturdays are highlighted when
+              availability reaches 2 or more. Day-use stays visible for context.
+            </p>
+          </div>
+          <button id="lock-button" class="ghost-button" type="button" hidden>
+            Lock
+          </button>
+        </div>
       </section>
 
       <section class="status-grid">

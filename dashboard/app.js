@@ -1,15 +1,27 @@
 (async function () {
+  const pageShell = document.getElementById("page-shell");
   const root = document.getElementById("calendar-root");
   const filterSelect = document.getElementById("permit-filter");
   const lastRefresh = document.getElementById("last-refresh");
   const primaryCount = document.getElementById("primary-count");
   const sourceLink = document.getElementById("source-link");
+  const lockButton = document.getElementById("lock-button");
 
   const state = {
     snapshot: null,
     status: null,
     filter: "all",
   };
+
+  const authConfig = normalizeAuth(window.WHITNEY_CONFIG.auth);
+  if (authConfig.enabled) {
+    await requireUnlock(authConfig);
+    lockButton.hidden = false;
+    lockButton.addEventListener("click", () => {
+      localStorage.removeItem(storageKey(authConfig));
+      window.location.reload();
+    });
+  }
 
   filterSelect.addEventListener("change", () => {
     state.filter = filterSelect.value;
@@ -183,6 +195,9 @@
   }
 
   function formatTimestamp(timestamp) {
+    if (!timestamp) {
+      return "Unavailable";
+    }
     return new Intl.DateTimeFormat("en-US", {
       dateStyle: "medium",
       timeStyle: "short",
@@ -195,5 +210,110 @@
       throw new Error(`HTTP ${response.status}`);
     }
     return response.json();
+  }
+
+  function normalizeAuth(auth) {
+    return {
+      enabled: Boolean(auth && auth.enabled && auth.hash),
+      hash: auth && auth.hash ? String(auth.hash) : "",
+    };
+  }
+
+  function storageKey(auth) {
+    return `whitney-dashboard-unlocked:${auth.hash}`;
+  }
+
+  async function requireUnlock(auth) {
+    if (localStorage.getItem(storageKey(auth)) === auth.hash) {
+      return;
+    }
+
+    pageShell.classList.add("is-locked");
+    const gate = buildGate();
+    document.body.appendChild(gate.overlay);
+
+    await new Promise((resolve) => {
+      gate.form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        gate.error.textContent = "";
+        gate.button.disabled = true;
+        gate.button.textContent = "Unlocking...";
+
+        const password = gate.input.value;
+        const candidateHash = await sha256(`whitney-dashboard:${password}`);
+        if (candidateHash === auth.hash) {
+          localStorage.setItem(storageKey(auth), auth.hash);
+          gate.overlay.remove();
+          pageShell.classList.remove("is-locked");
+          resolve();
+          return;
+        }
+
+        gate.error.textContent = "That password did not match.";
+        gate.button.disabled = false;
+        gate.button.textContent = "Unlock dashboard";
+        gate.input.select();
+      });
+    });
+  }
+
+  function buildGate() {
+    const overlay = document.createElement("div");
+    overlay.className = "auth-overlay";
+
+    const card = document.createElement("section");
+    card.className = "auth-card";
+
+    const eyebrow = document.createElement("p");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "Protected dashboard";
+
+    const title = document.createElement("h2");
+    title.className = "auth-title";
+    title.textContent = "Enter password to view availability";
+
+    const copy = document.createElement("p");
+    copy.className = "auth-copy";
+    copy.textContent = "The site stays unlocked on this browser until the password changes or you lock it.";
+
+    const form = document.createElement("form");
+    form.className = "auth-form";
+
+    const label = document.createElement("label");
+    label.className = "auth-label";
+    label.textContent = "Password";
+
+    const input = document.createElement("input");
+    input.className = "auth-input";
+    input.type = "password";
+    input.name = "password";
+    input.autocomplete = "current-password";
+    input.placeholder = "Enter password";
+    input.required = true;
+
+    const button = document.createElement("button");
+    button.className = "auth-button";
+    button.type = "submit";
+    button.textContent = "Unlock dashboard";
+
+    const error = document.createElement("p");
+    error.className = "auth-error";
+
+    label.appendChild(input);
+    form.append(label, button, error);
+    card.append(eyebrow, title, copy, form);
+    overlay.appendChild(card);
+
+    setTimeout(() => input.focus(), 0);
+
+    return { overlay, form, input, button, error };
+  }
+
+  async function sha256(text) {
+    const bytes = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((value) => value.toString(16).padStart(2, "0"))
+      .join("");
   }
 })();

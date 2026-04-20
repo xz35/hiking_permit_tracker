@@ -26,10 +26,23 @@ body {
     linear-gradient(180deg, #f8f3eb 0%, var(--bg) 52%, #ece4d6 100%);
 }
 
+.page-shell.is-locked {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+}
+
 .page-shell {
   max-width: 1240px;
   margin: 0 auto;
   padding: 32px 20px 64px;
+}
+
+.hero-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
 }
 
 .hero {
@@ -59,6 +72,100 @@ body {
   max-width: 820px;
   color: var(--muted);
   font-size: 1.05rem;
+}
+
+.ghost-button,
+.auth-button {
+  border: 1px solid rgba(95, 79, 51, 0.18);
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ghost-button {
+  padding: 10px 16px;
+  background: rgba(255, 250, 241, 0.96);
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 10;
+  background: rgba(42, 36, 28, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+.auth-card {
+  width: min(100%, 460px);
+  background: linear-gradient(180deg, rgba(255, 250, 241, 0.98), rgba(241, 232, 217, 0.96));
+  border: 1px solid rgba(95, 79, 51, 0.18);
+  border-radius: 28px;
+  padding: 30px;
+  box-shadow: 0 22px 60px rgba(50, 35, 16, 0.2);
+}
+
+.auth-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1.06;
+}
+
+.auth-copy {
+  margin: 14px 0 0;
+  color: var(--muted);
+}
+
+.auth-form {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.94rem;
+  color: var(--muted);
+}
+
+.auth-input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(95, 79, 51, 0.18);
+  background: rgba(255, 250, 241, 0.98);
+  color: var(--text);
+  font: inherit;
+}
+
+.auth-input:focus {
+  outline: 2px solid rgba(63, 107, 136, 0.3);
+  outline-offset: 1px;
+}
+
+.auth-button {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #355d76, #294d66);
+  color: #fff;
+}
+
+.auth-button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.auth-error {
+  min-height: 1.2em;
+  margin: 0;
+  color: #8c3b17;
 }
 
 .status-grid,
@@ -244,6 +351,10 @@ body {
 
   .hero {
     padding: 24px;
+  }
+
+  .hero-header {
+    flex-direction: column;
   }
 
   .day-cell,

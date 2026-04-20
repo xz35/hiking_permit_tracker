@@ -62,7 +62,23 @@ jobs:
           cp dashboard/index.html build/pages/
           cp dashboard/app.js build/pages/
           cp dashboard/styles.css build/pages/
-          cp dashboard/config.js build/pages/
+          DASHBOARD_PASSWORD="${{ secrets.WHITNEY_DASHBOARD_PASSWORD }}" python - <<'PY'
+          import hashlib
+          import os
+          from pathlib import Path
+
+          template = Path("dashboard/config.template.js").read_text(encoding="utf-8")
+          password = os.getenv("DASHBOARD_PASSWORD", "")
+          auth_enabled = "true" if password else "false"
+          auth_hash = hashlib.sha256(f"whitney-dashboard:{password}".encode("utf-8")).hexdigest() if password else ""
+
+          config = (
+              template
+              .replace("__WHITNEY_AUTH_ENABLED__", auth_enabled)
+              .replace("__WHITNEY_AUTH_HASH__", auth_hash)
+          )
+          Path("build/pages/config.js").write_text(config, encoding="utf-8")
+          PY
           touch build/pages/.nojekyll
 
       - name: Configure GitHub Pages
