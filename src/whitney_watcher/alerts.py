@@ -3,9 +3,29 @@ from __future__ import annotations
 import smtplib
 from email.message import EmailMessage
 from typing import Any
+from urllib.parse import urlencode
 
 from .config import Settings
 from .models import AlertEvent
+
+# Recreation.gov pre-selects a permit-type tab via the `type` query param on the
+# booking page. "overnight-permit" is confirmed from live booking URLs;
+# "day-use-permit" is a best guess. If a value is unknown we omit `type` and the
+# date link still lands on the correct day's availability page.
+_PERMIT_TYPE_URL_SLUG = {
+    "overnight": "overnight-permit",
+    "day_use": "day-use-permit",
+}
+
+
+def booking_deep_link(public_permit_url: str, entry_date: str, permit_type: str) -> str:
+    """Build a link straight to a specific date's booking page on Recreation.gov."""
+    base = public_permit_url.rstrip("/")
+    query = {"date": entry_date}
+    slug = _PERMIT_TYPE_URL_SLUG.get(permit_type)
+    if slug:
+        query["type"] = slug
+    return f"{base}/registration/detailed-availability?{urlencode(query)}"
 
 
 def _record_key(record: dict[str, Any]) -> tuple[str, str]:
@@ -113,6 +133,9 @@ def send_email_alerts(events: list[AlertEvent], settings: Settings) -> dict[str,
         "",
     ]
     for event in events:
+        deep_link = booking_deep_link(
+            event.public_permit_url, event.entry_date, event.permit_type
+        )
         lines.extend(
             [
                 f"- {event.entry_date}: {event.permit_type} now has {event.available_capacity} available "
@@ -120,7 +143,7 @@ def send_email_alerts(events: list[AlertEvent], settings: Settings) -> dict[str,
                 f"  Event: {event.event_type}",
                 f"  Primary match: {'yes' if event.is_primary_match else 'no'}",
                 f"  Observed at: {event.observed_at}",
-                f"  Recreation.gov: {event.public_permit_url}",
+                f"  Book this date: {deep_link}",
                 "",
             ]
         )

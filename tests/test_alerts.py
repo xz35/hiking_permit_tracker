@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from whitney_watcher.alerts import find_alert_events
+from whitney_watcher.alerts import booking_deep_link, find_alert_events
 from whitney_watcher.config import Settings
 
 
@@ -77,6 +77,31 @@ class AlertTests(unittest.TestCase):
         events = find_alert_events(current_snapshot, previous_snapshot=None, settings=self.settings)
         self.assertEqual(1, len(events))
         self.assertEqual("day_use_opened", events[0].event_type)
+
+
+class DeepLinkTests(unittest.TestCase):
+    def test_overnight_link_includes_date_and_type(self) -> None:
+        link = booking_deep_link(
+            "https://www.recreation.gov/permits/445860", "2026-07-03", "overnight"
+        )
+        self.assertEqual(
+            "https://www.recreation.gov/permits/445860/registration/"
+            "detailed-availability?date=2026-07-03&type=overnight-permit",
+            link,
+        )
+
+    def test_trailing_slash_in_base_is_handled(self) -> None:
+        link = booking_deep_link(
+            "https://www.recreation.gov/permits/445860/", "2026-07-03", "overnight"
+        )
+        self.assertNotIn("445860//", link)
+
+    def test_unknown_permit_type_omits_type_param(self) -> None:
+        link = booking_deep_link(
+            "https://www.recreation.gov/permits/445860", "2026-07-03", "mystery"
+        )
+        self.assertNotIn("type=", link)
+        self.assertIn("date=2026-07-03", link)
 
 
 if __name__ == "__main__":
